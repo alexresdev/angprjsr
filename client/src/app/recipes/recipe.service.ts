@@ -1,4 +1,5 @@
-import { EventEmitter, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
+import { Subject } from 'rxjs';
 
 import { Ingredient } from '../shared/ingredient.model';
 import { ShoppingListService } from '../shopping-list/shopping-list.service';
@@ -7,13 +8,13 @@ import { Recipe } from './recipe.model';
 
 @Injectable()
 export class RecipeService {
-    recipeSelected = new EventEmitter<Recipe>();
+    recipesChanged = new Subject<Recipe[]>();
 
     private recipes: Recipe[] = [
         new Recipe(
             'Chicken',
             'Perfect Roast Chicken', 
-            'https://cdn.pixabay.com/photo/2021/08/15/07/56/chicken-6547126_960_720.png',
+            'https://pigmine.ru/wp-content/uploads/0/6/7/06761109ae87b93097786de8b0f92c67.jpeg',
             [
                 new Ingredient('Chicken', 1),
                 new Ingredient('Spices', 20)
@@ -21,7 +22,7 @@ export class RecipeService {
         new Recipe(
             'Burger',
             'The best Burger have you ever eaten', 
-            'https://cdn.pixabay.com/photo/2014/12/21/23/56/hamburger-576419_960_720.png',
+            'https://farsh-recept.ru/wp-content/uploads/2020/04/s-bekonom.jpg',
             [
                 new Ingredient('Buns', 2),
                 new Ingredient('Meat', 1)
@@ -41,5 +42,20 @@ export class RecipeService {
 
       addIngredientsToShoppingList(ingredients: Ingredient[]) {
           this.slService.addIngredients(ingredients);
+      }
+
+      addRecipe(recipe: Recipe) {
+        this.recipes.push(recipe);
+        this.recipesChanged.next(this.recipes.slice());
+      }
+
+      updateRecipe(index: number, newRecipe: Recipe) {
+        this.recipes[index] = newRecipe;
+        this.recipesChanged.next(this.recipes.slice());
+      }
+
+      deleteRecipe(index: number) {
+        this.recipes.splice(index, 1);
+        this.recipesChanged.next(this.recipes.slice());
       }
 }
